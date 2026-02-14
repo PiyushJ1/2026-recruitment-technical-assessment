@@ -55,12 +55,13 @@ def parse_handwriting(recipeName: str) -> Union[str | None]:
     parsedRecipeName = ""
 
     for char in recipeName:
-        if char.isalnum() or char is " ":
+        if char.isalpha() or char == " ":
             parsedRecipeName += char
-        if char is "_" or char is "-":
+        if char == "_" or char == "-":
             parsedRecipeName += " "
 
     parsedRecipeName = parsedRecipeName.capitalize()
+
 
     # print(parsedRecipeName)
 

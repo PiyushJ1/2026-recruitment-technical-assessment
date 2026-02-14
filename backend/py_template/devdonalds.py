@@ -49,23 +49,30 @@ def parse():
 # [TASK 1] ====================================================================
 # Takes in a recipeName and returns it in a form that
 def parse_handwriting(recipeName: str) -> Union[str | None]:
-    if len(recipeName) <= 0:
+    if len(recipeName) == 0:
         return None
 
     parsedRecipeName = ""
 
+    # loop through and only add alphabets/whitespaces to new string
     for char in recipeName:
         if char.isalpha() or char == " ":
             parsedRecipeName += char
-        if char == "_" or char == "-":
+        if char == "_" or char == "-":  # replace '_' and '-' with " "
             parsedRecipeName += " "
 
-    parsedRecipeName = parsedRecipeName.capitalize()
+    final = ""
 
+    # capitalise each word in new string
+    for word in parsedRecipeName.split():
+        final += word.capitalize() + " "
 
-    # print(parsedRecipeName)
+    final = final.strip()  # remove leading/trailing whitespaces
 
-    return parsedRecipeName
+    if len(final) == 0:
+        return None
+
+    return final
 
 
 # [TASK 2] ====================================================================

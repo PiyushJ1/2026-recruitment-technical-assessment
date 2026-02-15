@@ -81,22 +81,23 @@ def parse_handwriting(recipeName: str) -> Union[str | None]:
 def create_entry():
     entries = request.get_json()
 
-    if entries["type"] != "recipe" and entries["type"] != "ingredient":
+    valid_types = ["recipe", "ingredient"]
+
+    if entries["type"] not in valid_types:
         return "'type' can only be recipe or ingredient", 400
 
     if entries["type"] == "ingredient":
-        if entries["cookTime"] is not None and entries["cookTime"] < 0:
+        if entries["cookTime"] < 0:
             return "cookTime can only be greater than or equal to 0", 400
 
-    if entries["type"] == "recipe":
-        RequiredItem
+    # if entries["type"] == "recipe":
 
     if entries["name"] in cookbook:
         return "entry names must be unique", 400
 
     cookbook[entries["name"]] = entries
 
-    return "not implemented", 500
+    return {}, 200
 
 
 # [TASK 3] ====================================================================

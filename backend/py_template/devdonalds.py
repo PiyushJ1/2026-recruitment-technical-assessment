@@ -32,7 +32,7 @@ class Ingredient(CookbookEntry):
 app = Flask(__name__)
 
 # Store your recipes here!
-cookbook = None
+cookbook = {}
 
 
 # Task 1 helper (don't touch)
@@ -79,7 +79,23 @@ def parse_handwriting(recipeName: str) -> Union[str | None]:
 # Endpoint that adds a CookbookEntry to your magical cookbook
 @app.route("/entry", methods=["POST"])
 def create_entry():
-    # TODO: implement me
+    entries = request.get_json()
+
+    if entries["type"] != "recipe" and entries["type"] != "ingredient":
+        return "'type' can only be recipe or ingredient", 400
+
+    if entries["type"] == "ingredient":
+        if entries["cookTime"] is not None and entries["cookTime"] < 0:
+            return "cookTime can only be greater than or equal to 0", 400
+
+    if entries["type"] == "recipe":
+        RequiredItem
+
+    if entries["name"] in cookbook:
+        return "entry names must be unique", 400
+
+    cookbook[entries["name"]] = entries
+
     return "not implemented", 500
 
 

@@ -79,23 +79,32 @@ def parse_handwriting(recipeName: str) -> Union[str | None]:
 # Endpoint that adds a CookbookEntry to your magical cookbook
 @app.route("/entry", methods=["POST"])
 def create_entry():
-    entries = request.get_json()
+    entry = request.get_json()
 
-    valid_types = ["recipe", "ingredient"]
+    entry_type = entry["type"]
+    name = entry["name"]
 
-    if entries["type"] not in valid_types:
+    # error handling
+    if entry_type not in ["recipe", "ingredient"]:
         return "'type' can only be recipe or ingredient", 400
 
-    if entries["type"] == "ingredient":
-        if entries["cookTime"] < 0:
-            return "cookTime can only be greater than or equal to 0", 400
+    if entry_type == "ingredient" and entry["cookTime"] < 0:
+        return "cookTime can only be greater than or equal to 0", 400
 
-    # if entries["type"] == "recipe":
-
-    if entries["name"] in cookbook:
+    if name in cookbook:
         return "entry names must be unique", 400
 
-    cookbook[entries["name"]] = entries
+    if entry_type == "recipe":
+        required_items = entry["requiredItems"]
+
+        seen_names = set()
+        for item in required_items:
+            if item in seen:
+                return "item already exists", 400
+
+            seen.add(item["name"])
+
+    cookbook[name] = entry
 
     return {}, 200
 

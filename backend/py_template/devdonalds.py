@@ -97,16 +97,16 @@ def create_entry():
     if entry_type == "recipe":
         required_items = entry["requiredItems"]
 
-        seen_names = set()
+        seen_item_names = []
         for item in required_items:
-            if item in seen:
+            if item["name"] in seen_item_names:
                 return "item already exists", 400
 
-            seen.add(item["name"])
+            seen_item_names.append(item["name"])
 
     cookbook[name] = entry
 
-    return {}, 200
+    return "", 200
 
 
 # [TASK 3] ====================================================================

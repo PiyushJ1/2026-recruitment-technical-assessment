@@ -121,7 +121,53 @@ def summary():
     if cookbook[name]["type"] != "recipe":
         return "name is not a recipe name", 400
 
-    return "not implemented", 500
+    ingredients = get_ingredients(name, 1)
+    if ingredients is None:
+        return "recipe contains recipes/ingredients not in cookbook", 400
+
+    total_time = 0
+    res = {}
+
+    for ingredient_name, quantity in ingredients:
+        if ingredient_name in res:
+            res[ingredient_name] += quantity
+        else:
+            res[ingredient_name] = quantity
+
+    for ingredient_name, quantity in res.items():
+        total_time += cookbook[ingredient_name]["cookTime"] * quantity
+
+    answer = {
+        "name": name,
+        "cookTime": total_time,
+        "ingredients": [{"name": n, "quantity": q} for n, q in res.items()],
+    }
+
+    return jsonify(answer), 200
+
+
+# helper function to recursively get ingredients
+def get_ingredients(name: str, quantity: int):
+    if name not in cookbook:
+        return None
+
+    entry = cookbook[name]
+
+    if entry["type"] == "ingredient":
+        return [(name, quantity)]
+
+    results = []
+    for item in entry["requiredItems"]:
+        item_name = item["name"]
+        item_quantity = item["quantity"] * quantity
+
+        child = get_ingredients(item_name, item_quantity)
+        if child is None:
+            return None
+
+        results.extend(child)
+
+    return results
 
 
 # =============================================================================

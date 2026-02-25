@@ -115,6 +115,7 @@ def create_entry():
 def summary():
     name = request.args.get("name")
 
+    # error checking
     if name not in cookbook:
         return "recipe with the corresponding name not found", 400
 
@@ -128,39 +129,51 @@ def summary():
     total_time = 0
     res = {}
 
+    # sum quantities of ingredients
     for ingredient_name, quantity in ingredients:
         if ingredient_name in res:
             res[ingredient_name] += quantity
         else:
             res[ingredient_name] = quantity
 
+    # calculate total cook time for the recipe
     for ingredient_name, quantity in res.items():
         total_time += cookbook[ingredient_name]["cookTime"] * quantity
 
     answer = {
         "name": name,
         "cookTime": total_time,
-        "ingredients": [{"name": n, "quantity": q} for n, q in res.items()],
+        "ingredients": [
+            {
+                "name": n, 
+                "quantity": qty
+            } 
+            for n, qty in res.items() # build ingredients list
+        ], 
     }
 
-    return jsonify(answer), 200
+    return answer, 200
 
 
 # helper function to recursively get ingredients
 def get_ingredients(name: str, quantity: int):
+    # base case - item does not exist
     if name not in cookbook:
         return None
 
     entry = cookbook[name]
-
+    
+    # base case - reached leaf node (base ingredient for recipe)
     if entry["type"] == "ingredient":
         return [(name, quantity)]
 
     results = []
+
     for item in entry["requiredItems"]:
         item_name = item["name"]
         item_quantity = item["quantity"] * quantity
 
+        # recurse on requiredItems
         child = get_ingredients(item_name, item_quantity)
         if child is None:
             return None
